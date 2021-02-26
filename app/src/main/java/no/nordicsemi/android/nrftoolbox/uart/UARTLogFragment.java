@@ -37,6 +37,8 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +94,7 @@ public class UARTLogFragment extends ListFragment implements LoaderManager.Loade
 
 			switch (state) {
 				case BleProfileService.STATE_CONNECTED: {
+					Log.i("UARTLogFragment","state connected");
 					onDeviceConnected();
 					break;
 				}
@@ -100,6 +103,7 @@ public class UARTLogFragment extends ListFragment implements LoaderManager.Loade
 					break;
 				}
 				case BleProfileService.STATE_CONNECTING:
+
 				case BleProfileService.STATE_DISCONNECTING:
 					// current implementation does nothing in this states
 				default:

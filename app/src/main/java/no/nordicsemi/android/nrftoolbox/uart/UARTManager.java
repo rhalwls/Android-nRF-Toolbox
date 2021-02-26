@@ -68,7 +68,6 @@ public class UARTManager extends LoggableBleManager<UARTManagerCallbacks> {
 	 * receiving indication, etc.
 	 */
 	private class UARTManagerGattCallback extends BleManagerGattCallback {
-
 		@Override
 		protected void initialize() {
 			setNotificationCallback(txCharacteristic)
@@ -105,7 +104,6 @@ public class UARTManager extends LoggableBleManager<UARTManagerCallbacks> {
 				else
 					useLongWrite = false;
 			}
-
 			return rxCharacteristic != null && txCharacteristic != null && (writeRequest || writeCommand);
 		}
 
