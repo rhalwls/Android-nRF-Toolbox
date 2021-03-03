@@ -45,6 +45,9 @@ class DeviceListAdapter extends BaseAdapter {
 	private static final int TYPE_TITLE = 0;
 	private static final int TYPE_ITEM = 1;
 	private static final int TYPE_EMPTY = 2;
+	//위에 리스트는 위에 보이는 bonded devices
+	//아래 리스트는 아래 보이는 available devices
+	//어차피 아래에만 있을거니까 신경 ㄴ
 
 	private final ArrayList<ExtendedBluetoothDevice> listBondedValues = new ArrayList<>();
 	private final ArrayList<ExtendedBluetoothDevice> listValues = new ArrayList<>();
@@ -122,7 +125,15 @@ class DeviceListAdapter extends BaseAdapter {
 			return listValues.get(position - bondedCount - 1);
 		}
 	}
+	//null이면 계속 스캔해야댐
+	//2번 호출해서 둘 다 null이 아니어야댐
+	public ExtendedBluetoothDevice getOurDevice(@NonNull final ScanResult result){
+		for (final ExtendedBluetoothDevice device : listValues)
+			if (device.name=="HD-CS-02")
+				return device;
 
+		return null;
+	}
 	@Override
 	public int getViewTypeCount() {
 		return 3;

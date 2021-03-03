@@ -130,6 +130,9 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	private ConfigurationListener configurationListener;
 	private boolean editMode;
 
+	//2개의 똑같은 버전 만들어야댐
+
+
 	public interface ConfigurationListener {
 		void onConfigurationModified();
 		void onConfigurationChanged(@NonNull final UartConfiguration configuration);
@@ -279,7 +282,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	public void onServicesDiscovered(@NonNull final BluetoothDevice device, final boolean optionalServicesFound) {
 		// do nothing
 	}
-
+	//selected2개 있으면 연결 가능
 	@Override
 	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) {
 		// The super method starts the service

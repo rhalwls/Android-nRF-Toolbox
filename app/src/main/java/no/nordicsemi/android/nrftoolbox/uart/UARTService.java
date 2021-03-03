@@ -57,7 +57,7 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     public static final String BROADCAST_UART_TX = "no.nordicsemi.android.nrftoolbox.uart.BROADCAST_UART_TX";
     public static final String BROADCAST_UART_RX = "no.nordicsemi.android.nrftoolbox.uart.BROADCAST_UART_RX";
     public static final String EXTRA_DATA = "no.nordicsemi.android.nrftoolbox.uart.EXTRA_DATA";
-    public byte[] arr =new byte[5000];
+    public byte[] arr =new byte[50000000];
     private int idx= 0;
     /**
      * A broadcast message with this action and the message in {@link Intent#EXTRA_TEXT} will be sent t the UART device.
@@ -87,11 +87,13 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     private UARTManager manager;
 
     private final LocalBinder binder = new UARTBinder();
-
+    int howManySent=0;
     public class UARTBinder extends LocalBinder implements UARTInterface {
         @Override
         public void send(final String text) {
             manager.send(text);
+            howManySent++;
+            Log.i("UARTService","sent idx : "+howManySent);
         }
     }
 
@@ -183,43 +185,67 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
         }
     }
     long beforetime;
+    int howManyRcv = 0;
     @Override
     public void onDataReceived(@NonNull final BluetoothDevice device, final String data) {
+
         final Intent broadcast = new Intent(BROADCAST_UART_RX);
         broadcast.putExtra(EXTRA_DEVICE, getBluetoothDevice());
         broadcast.putExtra(EXTRA_DATA, data);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
-
-        beforetime=System.currentTimeMillis();
-        Log.i("UARTService","first data recieved : "+beforetime);
-
-        for(int i = 0;i<data.length();i++){
-            arr[idx++] = (byte)data.charAt(i);
-
+        if(howManyRcv==0) {
+            beforetime = System.currentTimeMillis();
+            Log.i("UARTService", "first data recieved : " + beforetime);
         }
+        if(howManyRcv == 100){
+            long aftertime = System.currentTimeMillis();
+            Log.i("UARTService","100 recieved : "+(aftertime-beforetime));
+            return;
+        }
+        for(int i = 0;i<data.length();i++){
+            arr[idx++] = (byte)data.charAt(i); //append
+        }
+        boolean isMeasure = (char)data.charAt(1) == (char)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_LEFT||
+                (char)data.charAt(1) == (char)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_RIGHT;
+        Log.i("UARTService","how many rcvd = "+howManyRcv+data+"\n is measure?"+isMeasure);
+        Log.i("UARTService","difference in int : "+(int)data.charAt(1)+" , "+ (int)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_LEFT+ ","+ (int)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_RIGHT);
+        if(isMeasure){
+            long cur =System.currentTimeMillis();
+            Log.i("UARTService","send subsquent measure command : "+cur+" , "+(cur- beforetime));
+            if(cur-beforetime<Cons.MIN_MEASURE_SEC*1000) {
+                //uartmanager의 write 함수 써야댐
+                manager.send("" + data.charAt(1));
+            }
+            else{ //if not end write subsequently
+                manager.send(""+ (char) no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_STOP);
+            }
+        }
+        /*
         // send the data received to other apps, e.g. the Tasker
         final Intent globalBroadcast = new Intent(ACTION_RECEIVE);
         globalBroadcast.putExtra(BluetoothDevice.EXTRA_DEVICE, getBluetoothDevice());
         globalBroadcast.putExtra(Intent.EXTRA_TEXT, data);
         sendBroadcast(globalBroadcast);
-
+        */
         long aftertime = System.currentTimeMillis();
-        Log.i("UARTService",""+data.length()+" byte 달성 시간차: "+(aftertime-beforetime));
+        /*
+        Log.i("UARTService","몇 개 보냈나 : "+howManySent+" 몇번째로 받는가 : "+howManyRcv+
+                ", 길이는 얼마인가 : "+data.length()+" 첨 받을때로부터의 시간차ms: "+((aftertime-beforetime)));
         Log.i("UARTService","데이터 출력"+data);
-
-        int sumWrong =0;
-        for(int id = 0;id<0x80;id++){
-            if(data.charAt(id)+1 !=data.charAt(id+1)){
-                sumWrong++;
-                Log.i("UARTService","연속적이지 않음 : "+id+" 번째에서 "+(int)data.charAt(id)+" , "+(int)data.charAt(id+1));
-            }
+        String logAppend = "";
+        for(int id = 0;id<data.length();id++){
+            logAppend +=id+"/" + (int)data.charAt(id)+",";
         }
-        Log.i("UARTService",data.length()+"개 받는 동안 빠진 패킷 수 : "+sumWrong);
+        Log.i("UARTService",logAppend);
 
+         */
+
+        howManyRcv++;
     }
 
     @Override
     public void onDataSent(@NonNull final BluetoothDevice device, final String data) {
+
         final Intent broadcast = new Intent(BROADCAST_UART_TX);
         broadcast.putExtra(EXTRA_DEVICE, getBluetoothDevice());
         broadcast.putExtra(EXTRA_DATA, data);

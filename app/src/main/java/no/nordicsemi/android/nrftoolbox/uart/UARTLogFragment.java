@@ -257,6 +257,37 @@ public class UARTLogFragment extends ListFragment implements LoaderManager.Loade
 
 		field.setText(null);
 		field.requestFocus();
+		//sendRepeatdly(false);
+		final String ml = "" + (char)Constants.MODE_MEASURE_LEFT; //errorneous
+		uartInterface.send(ml);
+		//for 2 connection
+
+	}
+	private long startTime;
+
+	private void sendRepeatdly(boolean isRight){//
+		int ctrSend = 0;
+		startTime = System.currentTimeMillis();//시작할 때 한번만
+		while((System.currentTimeMillis()-startTime) < Cons.MAX_MEASURE_SEC*1000){
+			//writeCharacteristic(ledCharacteristic, Data.opCode((byte)(0X03))).with(ledCallback).enqueue();
+			//writeCharacteristic(ledCharacteristic,Data.opCode(Constants.MODE_MEASURE_RIGHT)).with(ledCallback).enqueue();
+			if(isRight) {
+				final String ml = "" + Constants.MODE_MEASURE_RIGHT; //errorneous
+				uartInterface.send(ml);
+			}
+			else {
+				final String mr = "" + Constants.MODE_MEASURE_LEFT;
+				uartInterface.send(mr);
+			}
+			try {
+				Thread.sleep(Cons.MEASURE_INTERVAL_MS);//얼마나 쉴건지에 대해서 근데 이렇게 했을 때 정확하게 동작 안할수도잇음
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			Log.i("UARTLogFragment","몇번째 커멘드 보내는가 : "+ctrSend+" 시작 시간이랑 차이ms : "+(System.currentTimeMillis()-startTime));
+			ctrSend++;
+		}
+
 	}
 
 	/**

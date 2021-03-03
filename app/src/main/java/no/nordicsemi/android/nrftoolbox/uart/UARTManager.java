@@ -113,6 +113,7 @@ public class UARTManager extends LoggableBleManager<UARTManagerCallbacks> {
 			txCharacteristic = null;
 			useLongWrite = true;
 		}
+
 	}
 
 	// This has been moved to the service in BleManager v2.0.
@@ -126,19 +127,25 @@ public class UARTManager extends LoggableBleManager<UARTManagerCallbacks> {
 	 * Sends the given text to RX characteristic.
 	 * @param text the text to be sent
 	 */
+	int sendidx = 0;
+	long starttime =0;
 	public void send(final String text) {
 		// Are we connected?
 		if (rxCharacteristic == null)
 			return;
 
 		if (!TextUtils.isEmpty(text)) {
+			if(sendidx ==0){
+				starttime = System.currentTimeMillis();
+			}
 			final WriteRequest request = writeCharacteristic(rxCharacteristic, text.getBytes())
 					.with((device, data) -> log(LogContract.Log.Level.APPLICATION,
-							"\"" + data.getStringValue(0) + "\" sent"));
+							"\"" + data.getStringValue(0) + "\" sent "+(sendidx++)+" timediff(ms) : "+(System.currentTimeMillis()-starttime)));
 			if (!useLongWrite) {
 				// This will automatically split the long data into MTU-3-byte long packets.
 				request.split();
 			}
+
 			request.enqueue();
 		}
 	}
