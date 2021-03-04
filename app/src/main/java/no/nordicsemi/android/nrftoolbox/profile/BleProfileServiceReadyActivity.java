@@ -24,7 +24,6 @@ package no.nordicsemi.android.nrftoolbox.profile;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -85,8 +84,12 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	private Button connectButton;
 
 	private ILogSession logSession;
-	private BluetoothDevice bluetoothDevice;
-	private String deviceName;
+	//2개의 device 두기 가능
+
+	private BluetoothDevice leftDevice = null;
+	private String leftName=null;
+	private BluetoothDevice rightDevice=null;
+	private String rightName=null;
 
 	private final BroadcastReceiver commonBroadcastReceiver = new BroadcastReceiver() {
 		@Override
@@ -106,13 +109,13 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 
 					switch (state) {
 						case BleProfileService.STATE_CONNECTED: {
-							deviceName = intent.getStringExtra(BleProfileService.EXTRA_DEVICE_NAME);
+							leftName = intent.getStringExtra(BleProfileService.EXTRA_DEVICE_NAME);
 							onDeviceConnected(bluetoothDevice);
 							break;
 						}
 						case BleProfileService.STATE_DISCONNECTED: {
 							onDeviceDisconnected(bluetoothDevice);
-							deviceName = null;
+							leftName = null;
 							break;
 						}
 						case BleProfileService.STATE_LINK_LOSS: {
@@ -175,23 +178,23 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		@Override
 		public void onServiceConnected(final ComponentName name, final IBinder service) {
 			final E bleService = BleProfileServiceReadyActivity.this.service = (E) service;
-			bluetoothDevice = bleService.getBluetoothDevice();
+			leftDevice = bleService.getBluetoothDevice();
 			logSession = bleService.getLogSession();
 			Logger.d(logSession, "Activity bound to the service");
 			onServiceBound(bleService);
 
 			// Update UI
-			deviceName = bleService.getDeviceName();
-			deviceNameView.setText(deviceName);
+			leftName = bleService.getDeviceName();
+			deviceNameView.setText(leftName);
 			connectButton.setText(R.string.action_disconnect);
 
 			// And notify user if device is connected
 			if (bleService.isConnected()) {
-				onDeviceConnected(bluetoothDevice);
+				onDeviceConnected(leftDevice);
 			} else {
 				// If the device is not connected it means that either it is still connecting,
 				// or the link was lost and service is trying to connect to it (autoConnect=true).
-				onDeviceConnecting(bluetoothDevice);
+				onDeviceConnecting(leftDevice);
 			}
 		}
 
@@ -206,8 +209,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 			connectButton.setText(R.string.action_connect);
 
 			service = null;
-			deviceName = null;
-			bluetoothDevice = null;
+			leftName = null;
+			leftDevice = null;
 			logSession = null;
 			onServiceUnbound();
 		}
@@ -281,8 +284,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 
 			Logger.d(logSession, "Activity unbound from the service");
 			onServiceUnbound();
-			deviceName = null;
-			bluetoothDevice = null;
+			leftName = null;
+			leftDevice = null;
 			logSession = null;
 		} catch (final IllegalArgumentException e) {
 			// do nothing, we were not connected to the sensor
@@ -374,8 +377,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	@Override
 	protected void onSaveInstanceState(@NonNull final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString(SIS_DEVICE_NAME, deviceName);
-		outState.putParcelable(SIS_DEVICE, bluetoothDevice);
+		outState.putString(SIS_DEVICE_NAME, leftName);
+		outState.putParcelable(SIS_DEVICE, leftDevice);
 		if (logSession != null)
 			outState.putParcelable(LOG_URI, logSession.getSessionUri());
 	}
@@ -383,8 +386,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	@Override
 	protected void onRestoreInstanceState(final @NonNull Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		deviceName = savedInstanceState.getString(SIS_DEVICE_NAME);
-		bluetoothDevice = savedInstanceState.getParcelable(SIS_DEVICE);
+		leftName = savedInstanceState.getString(SIS_DEVICE_NAME);
+		leftDevice = savedInstanceState.getParcelable(SIS_DEVICE);
 	}
 
 	@Override
@@ -454,9 +457,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	protected Uri getLocalAuthorityLogger() {
 		return null;
 	}
-
-	@Override
-	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) {
+	//결국에 scannerfragment에서 눌렸을 때 실행됨
+	public void mapADevice(@NonNull final BluetoothDevice device, final String name, boolean isLeft){
 		final int titleId = getLoggerProfileTitle();
 		if (titleId > 0) {
 			logSession = Logger.newSession(getApplicationContext(), getString(titleId), device.getAddress(), name);
@@ -465,9 +467,14 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 				logSession = LocalLogSession.newSession(getApplicationContext(), getLocalAuthorityLogger(), device.getAddress(), name);
 			}
 		}
-		bluetoothDevice = device;
-		deviceName = name;
-
+		if(isLeft) {
+			leftDevice = device;
+			leftName = name;
+		}
+		else{
+			rightDevice = device;
+			rightName= name;
+		}
 		// The device may not be in the range but the service will try to connect to it if it reach it
 		Logger.d(logSession, "Creating service...");
 		final Intent service = new Intent(this, getServiceClass());
@@ -478,6 +485,18 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		startService(service);
 		Logger.d(logSession, "Binding to the service...");
 		bindService(service, serviceConnection, 0);
+
+	}
+	@Override
+	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) { //scannerfragment의 deviceselected listener가 여기서 구현된건가?
+
+		if(leftDevice == null){
+			mapADevice(device,name,true);
+		}
+		else{
+			mapADevice(device,name,false);
+		}
+
 	}
 
 	@Override
@@ -487,13 +506,13 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 
 	@Override
 	public void onDeviceConnecting(@NonNull final BluetoothDevice device) {
-		deviceNameView.setText(deviceName != null ? deviceName : getString(R.string.not_available));
+		deviceNameView.setText(leftName != null ? leftName : getString(R.string.not_available));
 		connectButton.setText(R.string.action_connecting);
 	}
 
 	@Override
 	public void onDeviceConnected(@NonNull final BluetoothDevice device) {
-		deviceNameView.setText(deviceName);
+		deviceNameView.setText(leftName);
 		connectButton.setText(R.string.action_disconnect);
 	}
 
@@ -514,8 +533,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 
 			Logger.d(logSession, "Activity unbound from the service");
 			onServiceUnbound();
-			deviceName = null;
-			bluetoothDevice = null;
+			leftName = null;
+			leftDevice = null;
 			logSession = null;
 		} catch (final IllegalArgumentException e) {
 			// do nothing. This should never happen but does...
@@ -591,8 +610,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	/**
 	 * Returns the name of the device that the phone is currently connected to or was connected last time
 	 */
-	protected String getDeviceName() {
-		return deviceName;
+	protected String getLeftName() {
+		return leftName;
 	}
 
 	/**

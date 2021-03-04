@@ -237,7 +237,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		setContentView(R.layout.activity_feature_uart);
 
 		container = findViewById(R.id.container);
-		// Setup the sliding pane if it exists
+		// Setup the sliding pane if it exist
 		final SlidingPaneLayout slidingPane = slider = findViewById(R.id.sliding_pane);
 		if (slidingPane != null) {
 			slidingPane.setSliderFadeColor(Color.TRANSPARENT);
@@ -283,14 +283,25 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		// do nothing
 	}
 	//selected2개 있으면 연결 가능
+	int cur_selected=0;//연결시 +1 해제시 -1
 	@Override
 	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) {
 		// The super method starts the service
 		super.onDeviceSelected(device, name);
+		//나중에 2발에 대해서 fragment 똑같은 거 2개 만들어서 구현하기
+		/*
+		if(cur_selected ==0){
 
+		}
+
+		 */
+		//log fragment를 2개를 만들면 어떨까
+		//log fragment를 이미 바인딩돼있을 때는 2번째 log fragment에 바인딩되게 하자
 		// Notify the log fragment about it
 		final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log);
 		logFragment.onServiceStarted();
+
+
 	}
 
 	@Override

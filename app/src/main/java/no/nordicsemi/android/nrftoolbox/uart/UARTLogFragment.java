@@ -265,7 +265,7 @@ public class UARTLogFragment extends ListFragment implements LoaderManager.Loade
 	}
 	private long startTime;
 
-	private void sendRepeatdly(boolean isRight){//
+	private void sendRepeatdly(boolean isRight){//deceperated
 		int ctrSend = 0;
 		startTime = System.currentTimeMillis();//시작할 때 한번만
 		while((System.currentTimeMillis()-startTime) < Cons.MAX_MEASURE_SEC*1000){

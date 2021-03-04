@@ -122,7 +122,7 @@ public class ScannerFragment extends DialogFragment {
 	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		try {
-			this.listener = (OnDeviceSelectedListener) context;
+			this.listener = (OnDeviceSelectedListener) context;//listener의 초기화는 자기자신
 		} catch (final ClassCastException e) {
 			throw new ClassCastException(context.toString() + " must implement OnDeviceSelectedListener");
 		}
@@ -166,7 +166,7 @@ public class ScannerFragment extends DialogFragment {
 			stopScan();
 			dialog.dismiss();
 			final ExtendedBluetoothDevice d = (ExtendedBluetoothDevice) adapter.getItem(position);
-			listener.onDeviceSelected(d.device, d.name);
+			listener.onDeviceSelected(d.device, d.name);//ondevice selected 매핑함
 		});
 
 		permissionRationale = dialogView.findViewById(R.id.permission_rationale); // this is not null only on API23+
