@@ -25,4 +25,8 @@
     <declare-styleable name="ForegroundRelativeLayout">
         <attr name="foreground" format="reference|color" />
     </declare-styleable>
+    <declare-styleable name="HeatMapHolder">
+        <attr name="img_on_top" format="integer"/>
+
+    </declare-styleable>
 </resources>

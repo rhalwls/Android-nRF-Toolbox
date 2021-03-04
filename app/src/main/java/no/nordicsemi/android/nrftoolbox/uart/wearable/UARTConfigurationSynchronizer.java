@@ -32,7 +32,8 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-
+import com.google.android.gms.tasks.Tasks;
+import java.util.concurrent.ExecutionException;
 import java.util.ArrayList;
 
 import no.nordicsemi.android.nrftoolbox.uart.domain.Command;
@@ -70,6 +71,9 @@ public class UARTConfigurationSynchronizer {
 				.addApiIfAvailable(Wearable.API)
 				.addConnectionCallbacks(listener)
 				.build();
+
+
+
 		googleApiClient.connect();
 	}
 
