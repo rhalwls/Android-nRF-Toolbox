@@ -31,13 +31,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.ListFragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +42,13 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.example.traceappproject_daram.data.Result;
 
 import no.nordicsemi.android.log.ILogSession;
@@ -56,7 +56,7 @@ import no.nordicsemi.android.log.LogContract;
 import no.nordicsemi.android.nrftoolbox.R;
 import no.nordicsemi.android.nrftoolbox.profile.BleProfileService;
 
-public class UARTLogFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class UARTLogFragmentSecond extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String SIS_LOG_SCROLL_POSITION = "sis_scroll_position";
 	private static final int LOG_SCROLL_NULL = -1;
 	private static final int LOG_SCROLLED_TO_BOTTOM = -2;
@@ -127,7 +127,7 @@ public class UARTLogFragment extends ListFragment implements LoaderManager.Loade
 
 			// Start the loader
 			if (logSession != null) {
-				getLoaderManager().restartLoader(LOG_REQUEST_ID, null, UARTLogFragment.this);
+				getLoaderManager().restartLoader(LOG_REQUEST_ID, null, UARTLogFragmentSecond.this);
 			}
 
 			// and notify user if device is connected

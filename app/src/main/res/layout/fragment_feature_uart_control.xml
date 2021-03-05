@@ -79,12 +79,26 @@
 	<com.google.android.material.button.MaterialButton
 		android:id="@+id/action_connect"
 		style="@style/Widget.Connect"
-		android:layout_width="wrap_content"
+		android:layout_width="100dp"
 		android:layout_height="wrap_content"
 		android:layout_above="@+id/spacer"
 		android:layout_centerHorizontal="true"
 		android:onClick="onConnectClicked"
-		android:text="@string/action_connect"/>
+		android:text="@string/action_connect" />
+
+	<com.google.android.material.button.MaterialButton
+		android:id="@+id/action_connect2"
+		style="@style/Widget.Connect"
+		android:layout_width="100dp"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/spacer"
+		android:layout_alignParentStart="true"
+		android:layout_alignParentEnd="true"
+		android:layout_marginStart="268dp"
+		android:layout_marginEnd="43dp"
+		android:layout_marginBottom="-2dp"
+		android:onClick="onConnectClicked"
+		android:text="@string/action_connect" />
 
 	<View
 		android:id="@+id/spacer"

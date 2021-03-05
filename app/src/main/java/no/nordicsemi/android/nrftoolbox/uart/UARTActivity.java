@@ -47,6 +47,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+
+import com.example.traceappproject_daram.data.LoginInfo;
+
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
@@ -99,6 +102,8 @@ import no.nordicsemi.android.nrftoolbox.uart.wearable.UARTConfigurationSynchroni
 import no.nordicsemi.android.nrftoolbox.utility.FileHelper;
 import no.nordicsemi.android.nrftoolbox.widget.ClosableSpinner;
 
+
+import com.example.traceappproject_daram.data.Result;
 public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UARTBinder> implements UARTInterface,
 		UARTNewConfigurationDialogFragment.NewConfigurationDialogListener, UARTConfigurationsAdapter.ActionListener, AdapterView.OnItemSelectedListener,
 		GoogleApiClient.ConnectionCallbacks {
@@ -130,7 +135,8 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	private ConfigurationListener configurationListener;
 	private boolean editMode;
 
-	//2개의 똑같은 버전 만들어야댐
+	private Result result; //측정을 시작할 result
+
 
 
 	public interface ConfigurationListener {
@@ -182,6 +188,11 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 		// Initialize Wearable synchronizer
 		wearableSynchronizer = UARTConfigurationSynchronizer.from(this, this);
+		//여기서 원래는 bundle에서 빈 (설정은 돼있는 result 객체 받아오겠지만)
+		//일단 빈 result 객체 생성
+
+		result = new Result(new LoginInfo("mijin","mijin"));
+
 	}
 
 	/**
@@ -298,10 +309,15 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		//log fragment를 2개를 만들면 어떨까
 		//log fragment를 이미 바인딩돼있을 때는 2번째 log fragment에 바인딩되게 하자
 		// Notify the log fragment about it
-		final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log);
-		logFragment.onServiceStarted();
 
-
+		if(cur_selected ==0){
+			final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log);
+			logFragment.onServiceStarted();
+		}
+		else if(cur_selected==1){//아마 보기는 힘들겠지만 그래도 로그는 찍혔으면 좋겠다
+			final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log2);
+			logFragment.onServiceStarted();
+		}
 	}
 
 	@Override

@@ -58,6 +58,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
     public static final String BROADCAST_BATTERY_LEVEL = "no.nordicsemi.android.nrftoolbox.BROADCAST_BATTERY_LEVEL";
     public static final String BROADCAST_ERROR = "no.nordicsemi.android.nrftoolbox.BROADCAST_ERROR";
 
+    //둘다 연결된 상태
     /**
      * The parameter passed when creating the service. Must contain the address of the sensor that we want to connect to
      */
@@ -328,7 +329,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
     protected boolean shouldAutoConnect() {
         return false;
     }
-
+    // 여기서
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent == null || !intent.hasExtra(EXTRA_DEVICE_ADDRESS))
@@ -339,6 +340,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
         deviceName = intent.getStringExtra(EXTRA_DEVICE_NAME);
 
         Logger.i(logSession, "Service started");
+        //방법 1. 여기서 2개를 만든다..?
+        //방법 2. 이 서비스를 2개를 만든다.......(선호)
 
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         final String deviceAddress = intent.getStringExtra(EXTRA_DEVICE_ADDRESS);

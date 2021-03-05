@@ -272,6 +272,7 @@ public class ScannerFragment extends DialogFragment {
 		@Override
 		public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
 			// do nothing
+			//여기서 나중에 sacn result 중에 내가 원하는 기기 있는지 체크 후 자동연결
 		}
 
 		@Override

@@ -34,6 +34,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.traceappproject_daram.data.Result;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
@@ -186,6 +187,14 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     }
     long beforetime;
     int howManyRcv = 0;
+    private Result result;//일단 있다 치고 나중에쓰기
+    //arr에 저장한 뒤 나중에 매핑
+    public void appendToArr(byte[] byteSet){ //append multiple data
+        // do not check validity
+        int howmany = byteSet.length-2;
+        System.arraycopy(byteSet,2,arr,idx,idx+howmany);
+        idx+=howmany;
+    }
     @Override
     public void onDataReceived(@NonNull final BluetoothDevice device, final String data) {
 
@@ -202,13 +211,23 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
             Log.i("UARTService","100 recieved : "+(aftertime-beforetime));
             return;
         }
+        /*
         for(int i = 0;i<data.length();i++){
             arr[idx++] = (byte)data.charAt(i); //append
         }
-        boolean isMeasure = (char)data.charAt(1) == (char)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_LEFT||
-                (char)data.charAt(1) == (char)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_RIGHT;
+
+         */
+        appendToArr(data.getBytes());
+        if(data.length() != 237){
+            Log.i("UARTService","wrong length data "+ data.length());
+            //나중에 시간 여건되면 validity 여기서 체크해도 댐
+        }
+
+
+        boolean isMeasure = (char)data.charAt(1) == (char) Cons.MODE_MEASURE_LEFT||
+                (char)data.charAt(1) == (char) Cons.MODE_MEASURE_RIGHT;
         Log.i("UARTService","how many rcvd = "+howManyRcv+data+"\n is measure?"+isMeasure);
-        Log.i("UARTService","difference in int : "+(int)data.charAt(1)+" , "+ (int)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_LEFT+ ","+ (int)no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_MEASURE_RIGHT);
+        Log.i("UARTService","difference in int : "+(int)data.charAt(1)+" , "+ (int) Cons.MODE_MEASURE_LEFT+ ","+ (int) Cons.MODE_MEASURE_RIGHT);
         if(isMeasure){
             long cur =System.currentTimeMillis();
             Log.i("UARTService","send subsquent measure command : "+cur+" , "+(cur- beforetime));
@@ -217,7 +236,7 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
                 manager.send("" + data.charAt(1));
             }
             else{ //if not end write subsequently
-                manager.send(""+ (char) no.nordicsemi.android.nrftoolbox.uart.Constants.MODE_STOP);
+                manager.send(""+ (char) Cons.MODE_STOP);
             }
         }
         /*

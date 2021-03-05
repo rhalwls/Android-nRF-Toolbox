@@ -111,6 +111,9 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 						case BleProfileService.STATE_CONNECTED: {
 							leftName = intent.getStringExtra(BleProfileService.EXTRA_DEVICE_NAME);
 							onDeviceConnected(bluetoothDevice);
+							//state connected
+							//방법1. 액티비티를 2개 만든다
+
 							break;
 						}
 						case BleProfileService.STATE_DISCONNECTED: {
@@ -513,7 +516,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	@Override
 	public void onDeviceConnected(@NonNull final BluetoothDevice device) {
 		deviceNameView.setText(leftName);
-		connectButton.setText(R.string.action_disconnect);
+		//connectButton.setText(R.string.action_disconnect);
+		connectButton.setText(R.string.action_connect);
 	}
 
 	@Override

@@ -745,6 +745,8 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
 	 * Callback of CONNECT/DISCONNECT button on DfuActivity
 	 */
 	public void onConnectClicked(final View view) {
+		//4개 onConnectclicked 중에 이거인듯
+
 		if (isBLEEnabled()) {
 			showDeviceScanningDialog();
 		} else {

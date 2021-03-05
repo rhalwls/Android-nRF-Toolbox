@@ -48,6 +48,7 @@
 		android:name=".ToolboxApplication"
 		tools:ignore="GoogleAppIndexingWarning" >
 
+		<activity android:name="com.example.traceappproject_daram.reprot_page.MovingFeetHeatmapActivity"></activity>
 		<meta-data
 			android:name="com.google.android.gms.version"
 			android:value="@integer/google_play_services_version" />

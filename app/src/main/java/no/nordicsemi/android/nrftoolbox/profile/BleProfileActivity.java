@@ -272,7 +272,8 @@ public abstract class BleProfileActivity extends AppCompatActivity implements Bl
 	@Override
 	public void onDeviceConnected(@NonNull final BluetoothDevice device) {
 		deviceConnected = true;
-		runOnUiThread(() -> connectButton.setText(R.string.action_disconnect));
+		//runOnUiThread(() -> connectButton.setText(R.string.action_disconnect));
+		runOnUiThread(() -> connectButton.setText(R.string.action_connect));
 	}
 
 	@Override
