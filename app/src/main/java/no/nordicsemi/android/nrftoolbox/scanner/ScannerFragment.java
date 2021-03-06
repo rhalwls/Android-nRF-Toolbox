@@ -118,6 +118,9 @@ public class ScannerFragment extends DialogFragment {
 		 */
 		void onDeviceSelected(@NonNull final BluetoothDevice device, @Nullable final String name);
 
+
+
+
 		/**
 		 * Fired when scanner dialog has been cancelled without selecting a device.
 		 */
