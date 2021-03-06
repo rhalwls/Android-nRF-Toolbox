@@ -61,6 +61,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -95,6 +96,7 @@ import no.nordicsemi.android.nrftoolbox.ToolboxApplication;
 import no.nordicsemi.android.nrftoolbox.dfu.adapter.FileBrowserAppsAdapter;
 import no.nordicsemi.android.nrftoolbox.profile.BleProfileService;
 import no.nordicsemi.android.nrftoolbox.profile.BleProfileServiceReadyActivity;
+import no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment;
 import no.nordicsemi.android.nrftoolbox.uart.database.DatabaseHelper;
 import no.nordicsemi.android.nrftoolbox.uart.domain.Command;
 import no.nordicsemi.android.nrftoolbox.uart.domain.UartConfiguration;
@@ -129,7 +131,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	private SharedPreferences preferences;
 	private UARTConfigurationsAdapter configurationsAdapter;
 	private ClosableSpinner configurationSpinner;
-	private SlidingPaneLayout slider;
+	private LinearLayout slider;
 	private View container;
 	private UARTService.UARTBinder serviceBinder;
 	private ConfigurationListener configurationListener;
@@ -199,7 +201,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	 * Method called when Google API Client connects to Wearable.API.
 	 */
 	@Override
-	public void onConnected(final Bundle bundle) {
+	public void onConnected(final Bundle bundle) { //bundle을 주는
 		// Ensure the Wearable API was connected
 		if (!wearableSynchronizer.hasConnectedApi())
 			return;
@@ -227,7 +229,13 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 			}).start();
 		}
 	}
-
+	@Override
+	protected void showDeviceScanningDialog(final UUID filter) {
+		//버튼 connect를 눌렀을 때 싱글톤 방식으로 스캐너 fragment 가져옴
+		final ScannerFragment dialog = ScannerFragment.getInstance(filter);
+		dialog.show(getSupportFragmentManager(), "scan_fragment");
+		dialog.setMomActivity(this);
+	}
 	/**
 	 * Method called then Google API client connection was suspended.
 	 * @param cause the cause of suspension
@@ -249,19 +257,8 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 		container = findViewById(R.id.container);
 		// Setup the sliding pane if it exist
-		final SlidingPaneLayout slidingPane = slider = findViewById(R.id.sliding_pane);
-		if (slidingPane != null) {
-			slidingPane.setSliderFadeColor(Color.TRANSPARENT);
-			slidingPane.setShadowResourceLeft(R.drawable.shadow_r);
-			slidingPane.setPanelSlideListener(new SlidingPaneLayout.SimplePanelSlideListener() {
-				@Override
-				public void onPanelClosed(final View panel) {
-					// Close the keyboard
-					final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log);
-					logFragment.onFragmentHidden();
-				}
-			});
-		}
+		final LinearLayout slidingPane = slider = findViewById(R.id.sliding_pane);
+
 	}
 
 	@Override
@@ -299,18 +296,20 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) {
 		// The super method starts the service
 		super.onDeviceSelected(device, name);
+		Log.i("UARTActivity","ondeviceselected called");
+
 		//나중에 2발에 대해서 fragment 똑같은 거 2개 만들어서 구현하기
 		/*
 		if(cur_selected ==0){
 
 		}
 
-		 */
+		*/
 		//log fragment를 2개를 만들면 어떨까
 		//log fragment를 이미 바인딩돼있을 때는 2번째 log fragment에 바인딩되게 하자
 		// Notify the log fragment about it
 
-		if(cur_selected ==0){
+		if(cur_selected == 0){
 			final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log);
 			logFragment.onServiceStarted();
 		}
@@ -348,10 +347,13 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 	@Override
 	public void onBackPressed() {
+		/*
 		if (slider != null && slider.isOpen()) {
 			slider.closePane();
 			return;
 		}
+
+		 */
 		if (editMode) {
 			setEditMode(false);
 			return;
@@ -377,7 +379,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 				setEditMode(!editMode);
 				return true;
 			case R.id.action_show_log:
-				slider.openPane();
+				//slider.openPane();
 				return true;
 			case R.id.action_share: {
 				final String xml = databaseHelper.getConfiguration(configurationSpinner.getSelectedItemId());
@@ -702,7 +704,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 			}
 
 			if (slider != null && editMode) {
-				slider.closePane();
+				//slider.closePane();
 			}
 		}
 	}

@@ -192,7 +192,7 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     public void appendToArr(byte[] byteSet){ //append multiple data
         // do not check validity
         int howmany = byteSet.length-2;
-        System.arraycopy(byteSet,2,arr,idx,idx+howmany);
+        System.arraycopy(byteSet,2,arr,idx,howmany);
         idx+=howmany;
     }
     @Override

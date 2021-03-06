@@ -49,7 +49,7 @@ import no.nordicsemi.android.log.Logger;
 public abstract class BleProfileService extends Service implements BleManagerCallbacks {
     @SuppressWarnings("unused")
     private static final String TAG = "BleProfileService";
-
+    //STATE 대그룹
     public static final String BROADCAST_CONNECTION_STATE = "no.nordicsemi.android.nrftoolbox.BROADCAST_CONNECTION_STATE";
     public static final String BROADCAST_SERVICES_DISCOVERED = "no.nordicsemi.android.nrftoolbox.BROADCAST_SERVICES_DISCOVERED";
     public static final String BROADCAST_DEVICE_READY = "no.nordicsemi.android.nrftoolbox.DEVICE_READY";
@@ -77,12 +77,16 @@ public abstract class BleProfileService extends Service implements BleManagerCal
     public static final String EXTRA_BATTERY_LEVEL = "no.nordicsemi.android.nrftoolbox.EXTRA_BATTERY_LEVEL";
     public static final String EXTRA_ERROR_MESSAGE = "no.nordicsemi.android.nrftoolbox.EXTRA_ERROR_MESSAGE";
     public static final String EXTRA_ERROR_CODE = "no.nordicsemi.android.nrftoolbox.EXTRA_ERROR_CODE";
-
+    //STATE 소그룹
     public static final int STATE_LINK_LOSS = -1;
     public static final int STATE_DISCONNECTED = 0;
     public static final int STATE_CONNECTED = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_DISCONNECTING = 3;
+    public static final int STATE_TWO_CONNECTED = 1;
+    public static final int STATE_TWO_CONNECTING = 2;
+    public static final int STATE_TWO_DISCONNECTING = 3;
+
 
     private LoggableBleManager<BleManagerCallbacks> bleManager;
     private Handler handler;

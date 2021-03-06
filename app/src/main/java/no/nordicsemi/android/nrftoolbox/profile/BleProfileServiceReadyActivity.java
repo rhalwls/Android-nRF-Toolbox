@@ -111,7 +111,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 						case BleProfileService.STATE_CONNECTED: {
 							leftName = intent.getStringExtra(BleProfileService.EXTRA_DEVICE_NAME);
 							onDeviceConnected(bluetoothDevice);
-							//state connected
+							//state connected일 시 하나만 연결된 것
 							//방법1. 액티비티를 2개 만든다
 
 							break;
@@ -470,6 +470,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 				logSession = LocalLogSession.newSession(getApplicationContext(), getLocalAuthorityLogger(), device.getAddress(), name);
 			}
 		}
+
 		if(isLeft) {
 			leftDevice = device;
 			leftName = name;
@@ -663,9 +664,12 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 *                             services
 	 * @see #getFilterUUID()
 	 */
-	private void showDeviceScanningDialog(final UUID filter) {
+	//mj0305 to override in UARTActivity
+	protected void showDeviceScanningDialog(final UUID filter) {
+		//버튼 connect를 눌렀을 때 싱글톤 방식으로 스캐너 fragment 가져옴
 		final ScannerFragment dialog = ScannerFragment.getInstance(filter);
 		dialog.show(getSupportFragmentManager(), "scan_fragment");
+		//dialog.setMomActivity(this);
 	}
 
 	/**

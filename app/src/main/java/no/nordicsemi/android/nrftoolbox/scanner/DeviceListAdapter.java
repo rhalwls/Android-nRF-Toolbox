@@ -22,6 +22,7 @@
 package no.nordicsemi.android.nrftoolbox.scanner;
 
 import android.bluetooth.BluetoothDevice;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import no.nordicsemi.android.nrftoolbox.R;
+import no.nordicsemi.android.nrftoolbox.uart.UARTActivity;
 import no.nordicsemi.android.support.v18.scanner.ScanResult;
 
 /**
@@ -51,8 +53,11 @@ class DeviceListAdapter extends BaseAdapter {
 
 	private final ArrayList<ExtendedBluetoothDevice> listBondedValues = new ArrayList<>();
 	private final ArrayList<ExtendedBluetoothDevice> listValues = new ArrayList<>();
-
+	UARTActivity activity;
 	DeviceListAdapter() {
+	}
+	DeviceListAdapter(UARTActivity activity){
+		this.activity = activity;
 	}
 
 	/**
@@ -71,13 +76,29 @@ class DeviceListAdapter extends BaseAdapter {
 	 * @param results list of results from the scanner
 	 */
 	public void update(@NonNull final List<ScanResult> results) {
+		//여기서 업뎃되면서 fragment 달기 해보자
+		Log.i("DeviceListAdapter","update called");
 		for (final ScanResult result : results) {
 			final ExtendedBluetoothDevice device = findDevice(result);
-			if (device == null) {
+			if (device == null) {//기존 화면에 등록돼있는 걸 제외해야하기 때문에
 				listValues.add(new ExtendedBluetoothDevice(result));
+
+
 			} else {
+
 				device.name = result.getScanRecord() != null ? result.getScanRecord().getDeviceName() : null;
 				device.rssi = result.getRssi();
+
+				Log.i("DeviceListAdapter","linear search : "+(result.getDevice().getName()==null ? "null" : device.name));
+				if(device.name!=null&&device.name.startsWith("HD")){
+					Log.i("DeviceListAdapter","found HD device");
+					// 클릭한 효과주기
+					activity.onDeviceSelected(device.device,device.name);
+
+					break;
+
+				}
+
 			}
 		}
 		notifyDataSetChanged();
@@ -131,7 +152,6 @@ class DeviceListAdapter extends BaseAdapter {
 		for (final ExtendedBluetoothDevice device : listValues)
 			if (device.name=="HD-CS-02")
 				return device;
-
 		return null;
 	}
 	@Override

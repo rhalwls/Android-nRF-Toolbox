@@ -25,6 +25,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,6 +39,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -50,6 +53,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import no.nordicsemi.android.nrftoolbox.R;
+import no.nordicsemi.android.nrftoolbox.profile.BleProfileServiceReadyActivity;
+import no.nordicsemi.android.nrftoolbox.uart.UARTActivity;
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
 import no.nordicsemi.android.support.v18.scanner.ScanFilter;
@@ -92,7 +97,11 @@ public class ScannerFragment extends DialogFragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
+	private UARTActivity mother;
+	public void setMomActivity(UARTActivity activity){ //uartactivity에서만 호출될 메소드
 
+		mother = activity;
+	}
 	/**
 	 * Interface required to be implemented by activity.
 	 */
@@ -158,7 +167,7 @@ public class ScannerFragment extends DialogFragment {
 		final ListView listview = dialogView.findViewById(android.R.id.list);
 
 		listview.setEmptyView(dialogView.findViewById(android.R.id.empty));
-		listview.setAdapter(adapter = new DeviceListAdapter());
+		listview.setAdapter(/*adapter = new DeviceListAdapter()*/ adapter = new DeviceListAdapter(mother));
 
 		builder.setTitle(R.string.scanner_title);
 		final AlertDialog dialog = builder.setView(dialogView).create();
@@ -252,6 +261,9 @@ public class ScannerFragment extends DialogFragment {
 				stopScan();
 			}
 		}, SCAN_DURATION);
+
+
+
 	}
 
 	/**
@@ -272,12 +284,28 @@ public class ScannerFragment extends DialogFragment {
 		@Override
 		public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
 			// do nothing
+			Log.i("ScannerFragment","onScanResult called : "+ result.getDevice().getAddress());
 			//여기서 나중에 sacn result 중에 내가 원하는 기기 있는지 체크 후 자동연결
+			//result에는 하나의 bluetooth device밖에 없음
+			BluetoothDevice device = result.getDevice();
+
+			if(device.getName().startsWith("HD")){
+				//do connection work by mother
+				Log.i("ScannerFragment","HD device : " + device.getName());
+
+
+				mother.onDeviceSelected(device, device.getName());
+			}
+			else {
+				//do nothing
+			}
+
 		}
 
 		@Override
 		public void onBatchScanResults(@NonNull final List<ScanResult> results) {
 			adapter.update(results);
+			Log.i("ScannerFragment","onBatchScanResult called");
 		}
 
 		@Override
