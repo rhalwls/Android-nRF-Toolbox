@@ -79,6 +79,8 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	protected static final int REQUEST_ENABLE_BT = 2;
 
 	private E service;
+	private E serviceSecond;//오른발
+
 
 	private TextView deviceNameView;
 	private Button connectButton;
@@ -430,16 +432,18 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	/**
 	 * Called when user press CONNECT or DISCONNECT button. See layout files -> onClick attribute.
 	 */
+	//connect 버튼 눌렸을 때
 	public void onConnectClicked(final View view) {
 		if (isBLEEnabled()) {
 			if (service == null) {
 				setDefaultUI();
 				showDeviceScanningDialog(getFilterUUID());
 			} else {
-				service.disconnect();
+				//service.disconnect();
+				showDeviceScanningDialog(getFilterUUID());//
 			}
 		} else {
-			showBLEDialog();
+			showBLEDialog();//권한 요청
 		}
 	}
 

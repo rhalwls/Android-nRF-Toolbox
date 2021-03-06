@@ -83,9 +83,9 @@ public abstract class BleProfileService extends Service implements BleManagerCal
     public static final int STATE_CONNECTED = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_DISCONNECTING = 3;
-    public static final int STATE_TWO_CONNECTED = 1;
-    public static final int STATE_TWO_CONNECTING = 2;
-    public static final int STATE_TWO_DISCONNECTING = 3;
+    public static final int STATE_TWO_CONNECTED = 4;
+    public static final int STATE_TWO_CONNECTING = 5;
+    public static final int STATE_TWO_DISCONNECTING = 6;
 
 
     private LoggableBleManager<BleManagerCallbacks> bleManager;
