@@ -58,7 +58,7 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     public static final String BROADCAST_UART_TX = "no.nordicsemi.android.nrftoolbox.uart.BROADCAST_UART_TX";
     public static final String BROADCAST_UART_RX = "no.nordicsemi.android.nrftoolbox.uart.BROADCAST_UART_RX";
     public static final String EXTRA_DATA = "no.nordicsemi.android.nrftoolbox.uart.EXTRA_DATA";
-    public byte[] arr =new byte[50000000];
+
     private int idx= 0;
     /**
      * A broadcast message with this action and the message in {@link Intent#EXTRA_TEXT} will be sent t the UART device.
@@ -192,7 +192,7 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
     public void appendToArr(byte[] byteSet){ //append multiple data
         // do not check validity
         int howmany = byteSet.length-2;
-        System.arraycopy(byteSet,2,arr,idx,howmany);
+        System.arraycopy(byteSet,2,UARTConnector.arr,idx,howmany);
         idx+=howmany;
     }
     @Override
@@ -202,27 +202,33 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
         broadcast.putExtra(EXTRA_DEVICE, getBluetoothDevice());
         broadcast.putExtra(EXTRA_DATA, data);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+
+
+        if(data.charAt(1) == Cons.MODE_RUN){
+            if(UARTConnector.connectionMode == 0) {
+                manager.send("" + (char) Cons.MODE_MEASURE_LEFT);
+            }
+            else{
+                manager.send(""+(char) Cons.MODE_MEASURE_RIGHT);
+            }
+            return;
+        }
         if(howManyRcv==0) {
             beforetime = System.currentTimeMillis();
             Log.i("UARTService", "first data recieved : " + beforetime);
         }
         if(howManyRcv == 100){
+            //last data recieved
             long aftertime = System.currentTimeMillis();
             Log.i("UARTService","100 recieved : "+(aftertime-beforetime));
+
             return;
         }
-        /*
-        for(int i = 0;i<data.length();i++){
-            arr[idx++] = (byte)data.charAt(i); //append
-        }
-
-         */
         appendToArr(data.getBytes());
         if(data.length() != 237){
             Log.i("UARTService","wrong length data "+ data.length());
             //나중에 시간 여건되면 validity 여기서 체크해도 댐
         }
-
 
         boolean isMeasure = (char)data.charAt(1) == (char) Cons.MODE_MEASURE_LEFT||
                 (char)data.charAt(1) == (char) Cons.MODE_MEASURE_RIGHT;

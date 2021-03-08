@@ -88,6 +88,11 @@ public abstract class BleProfileService extends Service implements BleManagerCal
     public static final int STATE_TWO_DISCONNECTING = 6;
 
 
+
+    public static final int CUSTOM_READY = 100;
+    public static final int CUSTOM_MEASURING = 101;
+
+
     private LoggableBleManager<BleManagerCallbacks> bleManager;
     private Handler handler;
 

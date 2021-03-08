@@ -174,6 +174,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	@Override
 	protected void onServiceBound(final UARTService.UARTBinder binder) {
 		serviceBinder = binder;
+		Log.i(TAG,"onServiceBound called");
 	}
 
 	@Override
@@ -203,6 +204,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	@Override
 	public void onConnected(final Bundle bundle) { //bundle을 주는
 		// Ensure the Wearable API was connected
+		Log.i(TAG, "onConnected called");
 		if (!wearableSynchronizer.hasConnectedApi())
 			return;
 
@@ -292,19 +294,16 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	}
 	//selected2개 있으면 연결 가능
 	int cur_selected=0;//연결시 +1 해제시 -1
+	int connectionMode = 0;//모드에 따라서 달라짐
 	@Override
 	public void onDeviceSelected(@NonNull final BluetoothDevice device, final String name) {
 		// The super method starts the service
 		super.onDeviceSelected(device, name);
 		Log.i("UARTActivity","ondeviceselected called");
 
-		//나중에 2발에 대해서 fragment 똑같은 거 2개 만들어서 구현하기
+		UARTConnector connector = new UARTConnector(this,0);
+		connector.onServiceStarted();
 		/*
-		if(cur_selected ==0){
-
-		}
-
-		*/
 		//log fragment를 2개를 만들면 어떨까
 		//log fragment를 이미 바인딩돼있을 때는 2번째 log fragment에 바인딩되게 하자
 		// Notify the log fragment about it
@@ -317,6 +316,8 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 			final UARTLogFragment logFragment = (UARTLogFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_log2);
 			logFragment.onServiceStarted();
 		}
+
+		 */
 	}
 
 	@Override

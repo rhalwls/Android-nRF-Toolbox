@@ -47,12 +47,6 @@
 				android:isScrollContainer="true"
 				android:orientation="horizontal">
 
-				<fragment
-					android:id="@+id/fragment_log2"
-					android:name="no.nordicsemi.android.nrftoolbox.uart.UARTLogFragment"
-					android:layout_width="300dp"
-					android:layout_height="match_parent"
-					tools:layout="@layout/fragment_feature_uart_log" />
 
 				<fragment
 					android:id="@+id/fragment_log"
