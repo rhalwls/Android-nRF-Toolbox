@@ -35,6 +35,14 @@ public class Cons {//constants
     public final static int REQUEST_ENABLE_BT = 3054;
     // scan period in milliseconds
     public final static int SCAN_PERIOD = 5000;
+
+
+
+
+    //여기는 하드웨어와의 모드 명령어
+    //broadcast 명령어는 Bleprofileservice.java에 정의
+
+    //Todo: 하드웨어 구현된 거 보고 다시 맞추기
     public final static byte MODE_RUN = 0X31;
     public final static byte MODE_STOP = 0X32;
     public final static byte MODE_VERSION = 0X33;

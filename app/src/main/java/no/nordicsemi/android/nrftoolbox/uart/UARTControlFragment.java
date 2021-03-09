@@ -23,9 +23,11 @@
 package no.nordicsemi.android.nrftoolbox.uart;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +37,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import no.nordicsemi.android.nrftoolbox.R;
+import no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment;
+import no.nordicsemi.android.nrftoolbox.scanner.ScannerNoUI;
 import no.nordicsemi.android.nrftoolbox.uart.domain.Command;
 import no.nordicsemi.android.nrftoolbox.uart.domain.UartConfiguration;
 
@@ -56,6 +60,7 @@ public class UARTControlFragment extends Fragment implements GridView.OnItemClic
 			Log.e(TAG, "The parent activity must implement EditModeListener");
 		}
 	}
+
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {

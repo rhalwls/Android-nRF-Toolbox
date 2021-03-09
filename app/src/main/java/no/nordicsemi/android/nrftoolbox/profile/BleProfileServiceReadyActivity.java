@@ -32,9 +32,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -54,6 +56,7 @@ import no.nordicsemi.android.log.Logger;
 import no.nordicsemi.android.nrftoolbox.AppHelpFragment;
 import no.nordicsemi.android.nrftoolbox.R;
 import no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment;
+import no.nordicsemi.android.nrftoolbox.scanner.ScannerNoUI;
 import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
 
 /**
@@ -78,7 +81,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	private static final String LOG_URI = "log_uri";
 	protected static final int REQUEST_ENABLE_BT = 2;
 
-	private E service;
+	protected E service;
 	private E serviceSecond;//오른발
 
 
@@ -433,14 +436,37 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * Called when user press CONNECT or DISCONNECT button. See layout files -> onClick attribute.
 	 */
 	//connect 버튼 눌렸을 때
+	/*
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	public void onConnectClicked(final View view) {
+		if (isBLEEnabled()) {
+			if (service == null) {
+				ScannerNoUI scannerNoUI = new ScannerNoUI(getFilterUUID(),this,0);
+
+
+				final ScannerFragment dialog = ScannerFragment.getInstance(getFilterUUID());
+				dialog.show(getSupportFragmentManager(), "scan_fragment");
+				dialog.setMomActivity(this);
+
+			} else {
+
+			}
+		} else {
+			showBLEDialog();//권한 요청
+		}
+	}
+
+	 */
+
+	public void onConnectClickedOld(final View view) {
 		if (isBLEEnabled()) {
 			if (service == null) {
 				setDefaultUI();
 				showDeviceScanningDialog(getFilterUUID());
+
+
 			} else {
-				//service.disconnect();
-				showDeviceScanningDialog(getFilterUUID());//
+				service.disconnect();
 			}
 		} else {
 			showBLEDialog();//권한 요청

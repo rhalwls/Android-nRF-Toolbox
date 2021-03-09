@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -45,6 +46,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.ListFragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -81,10 +83,6 @@ public class UARTConnector {
 	/**
 	 * The log session created to log events related with the target device.
 	 */
-	private ILogSession logSession;
-
-	private EditText field;
-	private Button sendButton;
 
 	/**
 	 * The last list view position.
@@ -121,6 +119,7 @@ public class UARTConnector {
 	 * The receiver that listens for {@link BleProfileService#BROADCAST_CONNECTION_STATE} action.
 	 */
 	private final BroadcastReceiver commonBroadcastReceiver = new BroadcastReceiver() {
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
 			// This receiver listens only for the BleProfileService.BROADCAST_CONNECTION_STATE action, no need to check it.
@@ -147,6 +146,17 @@ public class UARTConnector {
 				case BleProfileService.CUSTOM_READY:
 					sendData(Cons.MODE_MEASURE_LEFT);
 					break;
+				case BleProfileService.CUSTOM_LEFT_INIT_DONE:
+					//sendData(Cons.MODE_RUN);//근데 이건 uartconnector를 새로 만들어야할듯
+					//이걸 받았을 때 왼발이 끊어진 상태가 아닐수도 잇슴
+					mother.makeScanNConnect();
+					break;
+				case BleProfileService.CUSTOM_RIGHT_INIT_DONE:
+					
+					break; 
+					case BleProfileService.CUSTOM_LEFT_DATA_DONE:
+
+						break;
 				default:
 					// there should be no other actions
 					break;
@@ -172,6 +182,7 @@ public class UARTConnector {
 		}
 	};
 	//bundle 받는 거 삭제
+	//이미 UARTActivity에 receiver를 등록해놓은 것
 	public void onCreate() {
 		LocalBroadcastManager.getInstance(mother).registerReceiver(commonBroadcastReceiver, makeIntentFilter());
 	}
@@ -233,13 +244,13 @@ public class UARTConnector {
 				sendDataInitially(Cons.MODE_RUN);
 				break;
 			case 1:
-				sendData(Cons.MODE_RUN);
-				break;
-			case 2:
 				sendDataInitially(Cons.MODE_RUN);
 				break;
+			case 2:
+				sendDataInitially(Cons.MODE_MEASURE_LEFT);
+				break;
 			case 3:
-				sendData(Cons.MODE_MEASURE_RIGHT);
+				sendDataInitially(Cons.MODE_MEASURE_RIGHT);
 				break;
 		}
 	}

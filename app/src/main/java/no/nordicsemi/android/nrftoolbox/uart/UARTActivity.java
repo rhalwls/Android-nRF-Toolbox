@@ -51,10 +51,13 @@ import androidx.annotation.NonNull;
 import com.example.traceappproject_daram.data.LoginInfo;
 
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
@@ -97,6 +100,7 @@ import no.nordicsemi.android.nrftoolbox.dfu.adapter.FileBrowserAppsAdapter;
 import no.nordicsemi.android.nrftoolbox.profile.BleProfileService;
 import no.nordicsemi.android.nrftoolbox.profile.BleProfileServiceReadyActivity;
 import no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment;
+import no.nordicsemi.android.nrftoolbox.scanner.ScannerNoUI;
 import no.nordicsemi.android.nrftoolbox.uart.database.DatabaseHelper;
 import no.nordicsemi.android.nrftoolbox.uart.domain.Command;
 import no.nordicsemi.android.nrftoolbox.uart.domain.UartConfiguration;
@@ -231,6 +235,9 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 			}).start();
 		}
 	}
+
+
+
 	@Override
 	protected void showDeviceScanningDialog(final UUID filter) {
 		//버튼 connect를 눌렀을 때 싱글톤 방식으로 스캐너 fragment 가져옴
@@ -301,7 +308,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		super.onDeviceSelected(device, name);
 		Log.i("UARTActivity","ondeviceselected called");
 
-		UARTConnector connector = new UARTConnector(this,0);
+		UARTConnector connector = new UARTConnector(this,this.connectionMode);
 		connector.onServiceStarted();
 		/*
 		//log fragment를 2개를 만들면 어떨까
@@ -319,7 +326,27 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 		 */
 	}
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public void makeScanNConnect(){
+		if (isBLEEnabled()) {
+			if (service == null) {
+				//모드에 따라 파싱은 scanner에서
+				ScannerNoUI scannerNoUI = new ScannerNoUI(getFilterUUID(),this,this.connectionMode);
 
+			}
+			else{
+				Log.i(TAG,"makeScanNConnect : service not null //connection persists");
+			}
+		} else {
+			showBLEDialog();//권한 요청
+		}
+	}
+
+	//왼발 셋팅, 오른발 셋팅
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public void onConnectClicked(final View view) {
+		makeScanNConnect();
+	}
 	@Override
 	protected int getDefaultDeviceName() {
 		return R.string.uart_default_name;

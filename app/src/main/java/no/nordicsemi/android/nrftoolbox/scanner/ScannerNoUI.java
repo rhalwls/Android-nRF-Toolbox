@@ -43,7 +43,7 @@ public class ScannerNoUI {
     private ScannerFragment.OnDeviceSelectedListener listener;
     private DeviceListAdapter adapter;
     private final Handler handler = new Handler();
-    private Button scanButton;
+
 
     private View permissionRationale;
 
@@ -59,7 +59,7 @@ public class ScannerNoUI {
         startScan();
     }
 
-    /*
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onRequestPermissionsResult(final int requestCode, final @NonNull String[] permissions, final @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_REQ_CODE: {
@@ -75,7 +75,7 @@ public class ScannerNoUI {
         }
     }
 
-     */
+
 
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
@@ -98,6 +98,9 @@ public class ScannerNoUI {
             }
 
         }
+        //connectionMode에 따라 선택해야하는 기기가 달라짐
+
+        private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
 
         @Override
         public void onBatchScanResults(@NonNull final List<ScanResult> results) {
@@ -113,9 +116,9 @@ public class ScannerNoUI {
                 device.rssi = result.getRssi();
 
                 Log.i("DeviceListAdapter","linear search : "+(result.getDevice().getName()==null ? "null" : device.name));
-                if(device.name!=null&&device.name.startsWith("HD")){
+                if(device.name!=null&&device.name.equals(DEVICE_NAMES[connectionMode])){
                     //HD면 바로 연결
-                    Log.i("DeviceListAdapter","found HD device");
+                    Log.i("DeviceListAdapter","found HD device , connectionMode , name"+connectionMode+device.name);
                     // 클릭한 효과주기
                     mother.onDeviceSelected(device.device,device.name);
                     break;
@@ -135,7 +138,9 @@ public class ScannerNoUI {
         adapter.addBondedDevices(devices);
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startScan() {
+    public void startScan() {
+
+
         // Since Android 6.0 we need to obtain Manifest.permission.ACCESS_FINE_LOCATION to be able to scan for
         // Bluetooth LE devices. This is related to beacons as proximity devices.
         // On API older than Marshmallow the following code does nothing.
@@ -173,8 +178,6 @@ public class ScannerNoUI {
     }
     private void stopScan() {
         if (scanning) {
-            scanButton.setText(R.string.scanner_action_scan);
-
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
             scanner.stopScan(scanCallback);
 

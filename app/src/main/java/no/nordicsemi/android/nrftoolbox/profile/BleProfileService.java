@@ -91,6 +91,10 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 
     public static final int CUSTOM_READY = 100;
     public static final int CUSTOM_MEASURING = 101;
+    public static final int CUSTOM_LEFT_INIT_DONE = 102;
+    public static final int CUSTOM_RIGHT_INIT_DONE = 103;
+    public static final int CUSTOM_LEFT_DATA_DONE= 104;
+    public static final int CUSTOM_RIGHT_DATA_DONE= 105;
 
 
     private LoggableBleManager<BleManagerCallbacks> bleManager;

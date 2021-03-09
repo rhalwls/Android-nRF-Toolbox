@@ -206,17 +206,28 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
 
         if(data.charAt(1) == Cons.MODE_RUN){
             if(UARTConnector.connectionMode == 0) {
-                manager.send("" + (char) Cons.MODE_MEASURE_LEFT);
+                manager.send("" + (char) BleProfileService.CUSTOM_LEFT_INIT_DONE);
+
             }
             else{
                 manager.send(""+(char) Cons.MODE_MEASURE_RIGHT);
             }
+            this.stopSelf();
+            //stopService();
             return;
         }
+        //version일 때 UARTConnector 변수에 저장해둬야함
+        if(data.charAt(1)==Cons.MODE_VERSION){
+
+        }
+
+
+
         if(howManyRcv==0) {
             beforetime = System.currentTimeMillis();
             Log.i("UARTService", "first data recieved : " + beforetime);
         }
+        //0xff 가 mode 값으로 주어졌을 때 종료를 broadcast
         if(howManyRcv == 100){
             //last data recieved
             long aftertime = System.currentTimeMillis();
@@ -225,7 +236,8 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
             return;
         }
         appendToArr(data.getBytes());
-        if(data.length() != 237){
+        //없앨 예정
+        if(data.length() != 237){ //마지막거는 똑같이 mtu 237 받을 거 같은데?
             Log.i("UARTService","wrong length data "+ data.length());
             //나중에 시간 여건되면 validity 여기서 체크해도 댐
         }
