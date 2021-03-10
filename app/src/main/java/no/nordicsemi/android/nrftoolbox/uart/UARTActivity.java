@@ -331,6 +331,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		if (isBLEEnabled()) {
 			if (service == null) {
 				//모드에 따라 파싱은 scanner에서
+				Log.i(TAG,"service was null");
 				ScannerNoUI scannerNoUI = new ScannerNoUI(getFilterUUID(),this,this.connectionMode);
 
 			}

@@ -76,7 +76,7 @@ public class ScannerNoUI {
     }
 
 
-
+    private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
@@ -100,7 +100,7 @@ public class ScannerNoUI {
         }
         //connectionMode에 따라 선택해야하는 기기가 달라짐
 
-        private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
+
 
         @Override
         public void onBatchScanResults(@NonNull final List<ScanResult> results) {
@@ -139,7 +139,7 @@ public class ScannerNoUI {
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void startScan() {
-
+        Log.i(TAG,"startScan called");
 
         // Since Android 6.0 we need to obtain Manifest.permission.ACCESS_FINE_LOCATION to be able to scan for
         // Bluetooth LE devices. This is related to beacons as proximity devices.
@@ -161,13 +161,18 @@ public class ScannerNoUI {
         */
 
         final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+        Log.i(TAG,"getScanner called");
+
         final ScanSettings settings = new ScanSettings.Builder()
                 .setLegacy(false)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1000).setUseHardwareBatchingIfSupported(false).build();
+        Log.i(TAG,"getSettingss called");
         final List<ScanFilter> filters = new ArrayList<>();
-        filters.add(new ScanFilter.Builder().setServiceUuid(uuid).build());
-        scanner.startScan(filters, settings, scanCallback);
 
+        filters.add(new ScanFilter.Builder().setServiceUuid(uuid).build());
+        Log.i(TAG,"filter add called");
+        scanner.startScan(filters, settings, scanCallback);
+        Log.i(TAG,"ble scanner.startscan called");
         scanning = true;
         handler.postDelayed(() -> {
             if (scanning) {
