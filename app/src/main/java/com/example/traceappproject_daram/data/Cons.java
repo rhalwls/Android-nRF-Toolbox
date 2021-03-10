@@ -23,7 +23,7 @@ public class Cons {//constants
     public static final int REP_START_FRAME = Result.calcSecToFrame(REP_START_SEC);
     public static final int REP_END_FRAME = Result.calcSecToFrame(REP_END_SEC);
 
-     */
-    public static final String IMG_EXT = ".jpg";
+    */
+    public static final String IMG_EXT = ".png";
 
 }
