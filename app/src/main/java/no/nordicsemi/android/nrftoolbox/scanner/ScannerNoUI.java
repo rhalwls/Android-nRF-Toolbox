@@ -3,6 +3,8 @@ package no.nordicsemi.android.nrftoolbox.scanner;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import no.nordicsemi.android.nrftoolbox.R;
+import no.nordicsemi.android.nrftoolbox.profile.BleProfileServiceReadyActivity;
 import no.nordicsemi.android.nrftoolbox.uart.UARTActivity;
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
@@ -50,12 +53,30 @@ public class ScannerNoUI {
     private ParcelUuid uuid;
     private int connectionMode;
     private boolean scanning = false;
-    private UARTActivity mother;
+    private BleProfileServiceReadyActivity mother;
+
+
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public ScannerNoUI(final UUID uuid, UARTActivity mother, int connectionMode) {
+    public ScannerNoUI(final UUID uuid, BleProfileServiceReadyActivity mother, int connectionMode) {
         this.uuid = new ParcelUuid(uuid);
+        final Bundle args = new Bundle();
+        if (uuid != null)
+            args.putParcelable(PARAM_UUID, new ParcelUuid(uuid));
         this.mother = mother;
         this.connectionMode = connectionMode;
+        this.listener = (ScannerFragment.OnDeviceSelectedListener) mother;
+        //uuid 관련된 작업들
+        //
+
+        if (args != null && args.containsKey(PARAM_UUID)) {
+            Log.i(TAG,"uuid = args.getParcelable");
+            this.uuid = args.getParcelable(PARAM_UUID);
+        }
+
+        final BluetoothManager manager = (BluetoothManager) mother.getSystemService(Context.BLUETOOTH_SERVICE);
+        if (manager != null) {
+            bluetoothAdapter = manager.getAdapter();
+        }
         startScan();
     }
 
@@ -76,7 +97,7 @@ public class ScannerNoUI {
     }
 
 
-
+    private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
@@ -86,7 +107,7 @@ public class ScannerNoUI {
             //result에는 하나의 bluetooth device밖에 없음
             BluetoothDevice device = result.getDevice();
 
-            if(device.getName().startsWith("HD")){
+            if(device.getName()!=null&&device.getName().startsWith("HD")){
                 //do connection work by mother
                 Log.i("ScannerFragment","HD device : " + device.getName());
 
@@ -100,7 +121,7 @@ public class ScannerNoUI {
         }
         //connectionMode에 따라 선택해야하는 기기가 달라짐
 
-        private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
+
 
         @Override
         public void onBatchScanResults(@NonNull final List<ScanResult> results) {
@@ -139,7 +160,7 @@ public class ScannerNoUI {
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void startScan() {
-
+        Log.i(TAG,"startScan called");
 
         // Since Android 6.0 we need to obtain Manifest.permission.ACCESS_FINE_LOCATION to be able to scan for
         // Bluetooth LE devices. This is related to beacons as proximity devices.
@@ -161,13 +182,22 @@ public class ScannerNoUI {
         */
 
         final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+        Log.i(TAG,"getScanner called");
+
         final ScanSettings settings = new ScanSettings.Builder()
                 .setLegacy(false)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1000).setUseHardwareBatchingIfSupported(false).build();
+        scanner.startScan(scanCallback);
+        Log.i(TAG,"getSettingss called");
+        /*
         final List<ScanFilter> filters = new ArrayList<>();
+
         filters.add(new ScanFilter.Builder().setServiceUuid(uuid).build());
+        Log.i(TAG,"filter add called");
         scanner.startScan(filters, settings, scanCallback);
 
+         */
+        Log.i(TAG,"ble scanner.startscan called");
         scanning = true;
         handler.postDelayed(() -> {
             if (scanning) {

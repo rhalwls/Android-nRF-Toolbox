@@ -206,19 +206,24 @@ public class UARTService extends BleProfileService implements UARTManagerCallbac
 
         if(data.charAt(1) == Cons.MODE_RUN){
             if(UARTConnector.connectionMode == 0) {
-                manager.send("" + (char) BleProfileService.CUSTOM_LEFT_INIT_DONE);
-
+                manager.send("" + (char) Cons.MODE_VERSION);
             }
             else{
                 manager.send(""+(char) Cons.MODE_MEASURE_RIGHT);
             }
-            this.stopSelf();
-            //stopService();
+            //this.stopService();
             return;
         }
         //version일 때 UARTConnector 변수에 저장해둬야함
         if(data.charAt(1)==Cons.MODE_VERSION){
-
+            if(UARTConnector.connectionMode == 0) {
+                final Intent broadcast2 = new Intent(BleProfileService.BROADCAST_CONNECTION_STATE);
+                //broadcast2.setAction(BleProfileService.BROADCAST_CONNECTION_STATE);
+                broadcast2.putExtra(BleProfileService.EXTRA_CONNECTION_STATE, BleProfileService.CUSTOM_LEFT_INIT_DONE);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast2);
+            }
+            //일단은 disconnect
+            return;
         }
 
 
