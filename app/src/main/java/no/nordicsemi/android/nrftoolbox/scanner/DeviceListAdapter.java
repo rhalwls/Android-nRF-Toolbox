@@ -37,6 +37,7 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import no.nordicsemi.android.nrftoolbox.R;
+import no.nordicsemi.android.nrftoolbox.profile.BleProfileServiceReadyActivity;
 import no.nordicsemi.android.nrftoolbox.uart.UARTActivity;
 import no.nordicsemi.android.support.v18.scanner.ScanResult;
 
@@ -53,10 +54,10 @@ class DeviceListAdapter extends BaseAdapter {
 
 	private final ArrayList<ExtendedBluetoothDevice> listBondedValues = new ArrayList<>();
 	private final ArrayList<ExtendedBluetoothDevice> listValues = new ArrayList<>();
-	UARTActivity activity;
+	BleProfileServiceReadyActivity activity;
 	DeviceListAdapter() {
 	}
-	DeviceListAdapter(UARTActivity activity){
+	DeviceListAdapter(BleProfileServiceReadyActivity activity){
 		this.activity = activity;
 	}
 

@@ -97,8 +97,8 @@ public class ScannerFragment extends DialogFragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-	private UARTActivity mother;
-	public void setMomActivity(UARTActivity activity){ //uartactivity에서만 호출될 메소드
+	private BleProfileServiceReadyActivity mother;
+	public void setMomActivity(BleProfileServiceReadyActivity activity){ //uartactivity에서만 호출될 메소드
 
 		mother = activity;
 	}
@@ -282,7 +282,8 @@ public class ScannerFragment extends DialogFragment {
 			scanning = false;
 		}
 	}
-
+	private int connectionMode =0;
+	private String DEVICE_NAMES[] = {"HD-CS-02L","HD-CS-02R","HD-CS-02L","HD-CS-02R"};
 	private ScanCallback scanCallback = new ScanCallback() {
 		@Override
 		public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
@@ -308,6 +309,24 @@ public class ScannerFragment extends DialogFragment {
 		@Override
 		public void onBatchScanResults(@NonNull final List<ScanResult> results) {
 			adapter.update(results);
+			Log.i("ScannerFragment","onBatchScanResult called");
+
+			Log.i("DeviceListAdapter","update called");
+			for (final ScanResult result : results) {
+				//final ExtendedBluetoothDevice device = findDevice(result);
+				final ExtendedBluetoothDevice device = new ExtendedBluetoothDevice(result);
+				device.name = result.getScanRecord() != null ? result.getScanRecord().getDeviceName() : null;
+				device.rssi = result.getRssi();
+
+				Log.i("DeviceListAdapter","linear search : "+(result.getDevice().getName()==null ? "null" : device.name));
+				if(device.name!=null&&device.name.equals(DEVICE_NAMES[connectionMode])){
+					//HD면 바로 연결
+					Log.i("DeviceListAdapter","found HD device , connectionMode , name"+connectionMode+device.name);
+					// 클릭한 효과주기
+					mother.onDeviceSelected(device.device,device.name);
+					break;
+				}
+			}
 			Log.i("ScannerFragment","onBatchScanResult called");
 		}
 

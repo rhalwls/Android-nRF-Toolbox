@@ -40,6 +40,8 @@ import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,6 +59,7 @@ import no.nordicsemi.android.nrftoolbox.AppHelpFragment;
 import no.nordicsemi.android.nrftoolbox.R;
 import no.nordicsemi.android.nrftoolbox.scanner.ScannerFragment;
 import no.nordicsemi.android.nrftoolbox.scanner.ScannerNoUI;
+import no.nordicsemi.android.nrftoolbox.uart.Cons;
 import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
 
 /**
@@ -74,7 +77,7 @@ import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
 @SuppressWarnings("unused")
 public abstract class BleProfileServiceReadyActivity<E extends BleProfileService.LocalBinder> extends AppCompatActivity implements
 		ScannerFragment.OnDeviceSelectedListener, BleManagerCallbacks {
-	private static final String TAG = "BleProfileServiceReadyActivity";
+	private static final String TAG = "BleProfileServiceRA";
 
 	private static final String SIS_DEVICE_NAME = "device_name";
 	private static final String SIS_DEVICE = "device";
@@ -97,6 +100,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	private String rightName=null;
 
 	private final BroadcastReceiver commonBroadcastReceiver = new BroadcastReceiver() {
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
 			// Check if the broadcast applies the connected device
@@ -104,6 +108,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 				return;
 
 			final BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BleProfileService.EXTRA_DEVICE);
+			Log.i(TAG,"commonBroadcastReceiver onReceive : "+intent.getAction()+" , "+ (bluetoothDevice==null));
 			if (bluetoothDevice == null)
 				return;
 
@@ -111,7 +116,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 			switch (action) {
 				case BleProfileService.BROADCAST_CONNECTION_STATE: {
 					final int state = intent.getIntExtra(BleProfileService.EXTRA_CONNECTION_STATE, BleProfileService.STATE_DISCONNECTED);
-
+					Log.i(BleProfileServiceReadyActivity.TAG,"action BROADCAST_CONNECTION_STATE received : "+state);
 					switch (state) {
 						case BleProfileService.STATE_CONNECTED: {
 							leftName = intent.getStringExtra(BleProfileService.EXTRA_DEVICE_NAME);
@@ -138,6 +143,29 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 							onDeviceDisconnecting(bluetoothDevice);
 							break;
 						}
+						case BleProfileService.CUSTOM_READY:
+							break;
+						case BleProfileService.CUSTOM_LEFT_INIT_DONE:
+							//sendData(Cons.MODE_RUN);//근데 이건 uartconnector를 새로 만들어야할듯
+							//이걸 받았을 때 왼발이 끊어진 상태가 아닐수도 잇슴
+							//mother.makeScanNConnect();
+							Log.i(BleProfileServiceReadyActivity.this.TAG,"receiver CUSTOM_LEFT_INIT_DONE received");
+							ScannerNoUI rightInitScanner = new ScannerNoUI(getFilterUUID(),BleProfileServiceReadyActivity.this,1);
+
+
+							break;
+						case BleProfileService.CUSTOM_RIGHT_INIT_DONE:
+
+							break;
+						case BleProfileService.CUSTOM_LEFT_DATA_DONE:
+
+							break;
+
+
+
+
+
+
 						default:
 							// there should be no other actions
 							break;
@@ -436,17 +464,19 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * Called when user press CONNECT or DISCONNECT button. See layout files -> onClick attribute.
 	 */
 	//connect 버튼 눌렸을 때
-	/*
+
 	@RequiresApi(api = Build.VERSION_CODES.M)
 	public void onConnectClicked(final View view) {
 		if (isBLEEnabled()) {
 			if (service == null) {
 				ScannerNoUI scannerNoUI = new ScannerNoUI(getFilterUUID(),this,0);
-
-
+				//showDeviceScanningDialog(getFilterUUID());
+				/*
 				final ScannerFragment dialog = ScannerFragment.getInstance(getFilterUUID());
 				dialog.show(getSupportFragmentManager(), "scan_fragment");
 				dialog.setMomActivity(this);
+
+				 */
 
 			} else {
 
@@ -456,7 +486,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		}
 	}
 
-	 */
+
 
 	public void onConnectClickedOld(final View view) {
 		if (isBLEEnabled()) {

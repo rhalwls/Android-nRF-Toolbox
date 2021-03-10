@@ -238,12 +238,17 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 
 
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	@Override
 	protected void showDeviceScanningDialog(final UUID filter) {
 		//버튼 connect를 눌렀을 때 싱글톤 방식으로 스캐너 fragment 가져옴
+		/*
 		final ScannerFragment dialog = ScannerFragment.getInstance(filter);
 		dialog.show(getSupportFragmentManager(), "scan_fragment");
 		dialog.setMomActivity(this);
+
+		 */
+		final ScannerNoUI scannerNoUI = new ScannerNoUI(filter,this,0);
 	}
 	/**
 	 * Method called then Google API client connection was suspended.
@@ -269,6 +274,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 		final LinearLayout slidingPane = slider = findViewById(R.id.sliding_pane);
 
 	}
+
 
 	@Override
 	protected void onViewCreated(final Bundle savedInstanceState) {
@@ -326,6 +332,7 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 
 		 */
 	}
+	/*
 	@RequiresApi(api = Build.VERSION_CODES.M)
 	public void makeScanNConnect(){
 		if (isBLEEnabled()) {
@@ -348,6 +355,8 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	public void onConnectClicked(final View view) {
 		makeScanNConnect();
 	}
+
+	 */
 	@Override
 	protected int getDefaultDeviceName() {
 		return R.string.uart_default_name;
@@ -362,6 +371,8 @@ public class UARTActivity extends BleProfileServiceReadyActivity<UARTService.UAR
 	protected UUID getFilterUUID() {
 		return null; // not used
 	}
+
+
 
 	@Override
 	public void send(final String text) {

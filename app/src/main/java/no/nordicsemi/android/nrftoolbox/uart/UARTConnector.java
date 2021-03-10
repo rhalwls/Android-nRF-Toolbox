@@ -88,6 +88,10 @@ public class UARTConnector {
 	 * The last list view position.
 	 */
 	public static int connectionMode =0;
+	public static boolean LEFT_INIT_ACTIVATED = false;
+	public static boolean RIGHT_INIT_ACTIVATED = false;
+	public static boolean LEFT_RECEIVE_ACTIVATED = false;
+	public static boolean RIGHT_RECEIVE_ACTIVATED = false;
 	private int logScrollPosition;
 	private UARTActivity mother;
 	public UARTConnector(UARTActivity mother,int connectionMode){
@@ -95,11 +99,15 @@ public class UARTConnector {
 		this.connectionMode = connectionMode;
 		onCreate();
 	}
-
-
+	public static boolean opened = false;
 
 	public void sendDataInitially(byte mode){
+		if(opened){
+			return;
+		}
+		opened = true;
 
+		Log.i(TAG,"sendDataInitially : "+(char)mode);
 		Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -124,6 +132,8 @@ public class UARTConnector {
 		public void onReceive(final Context context, final Intent intent) {
 			// This receiver listens only for the BleProfileService.BROADCAST_CONNECTION_STATE action, no need to check it.
 			final int state = intent.getIntExtra(BleProfileService.EXTRA_CONNECTION_STATE, BleProfileService.STATE_DISCONNECTED);
+			Log.i(TAG,"receiver onreceive called");
+
 
 			switch (state) {
 				case BleProfileService.STATE_CONNECTED: {
@@ -149,7 +159,11 @@ public class UARTConnector {
 				case BleProfileService.CUSTOM_LEFT_INIT_DONE:
 					//sendData(Cons.MODE_RUN);//근데 이건 uartconnector를 새로 만들어야할듯
 					//이걸 받았을 때 왼발이 끊어진 상태가 아닐수도 잇슴
-					mother.makeScanNConnect();
+					//mother.makeScanNConnect();
+					Log.i(TAG,"receiver CUSTOM_LEFT_INIT_DONE received");
+					onStop();
+
+
 					break;
 				case BleProfileService.CUSTOM_RIGHT_INIT_DONE:
 					
@@ -167,6 +181,7 @@ public class UARTConnector {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(final ComponentName name, final IBinder service) {
+			Log.i(TAG,"onServiceConnected called");
 			final UARTService.UARTBinder bleService = (UARTService.UARTBinder) service;
 			uartInterface = bleService;
 
@@ -177,7 +192,9 @@ public class UARTConnector {
 
 		@Override
 		public void onServiceDisconnected(final ComponentName name) {
+			Log.i(TAG,"onServiceDisconnected called");
 			onDeviceDisconnected();
+
 			uartInterface = null;
 		}
 	};
@@ -239,18 +256,19 @@ public class UARTConnector {
 		Log.i(TAG,"onDeviceConnected sleep end");
 
 		 */
+		Log.i(TAG,"connector connectionMode : "+connectionMode);
 		switch (connectionMode){
 			case 0:
 				sendDataInitially(Cons.MODE_RUN);
 				break;
 			case 1:
-				sendDataInitially(Cons.MODE_RUN);
+				//sendDataInitially(Cons.MODE_RUN);
 				break;
 			case 2:
-				sendDataInitially(Cons.MODE_MEASURE_LEFT);
+				//sendDataInitially(Cons.MODE_MEASURE_LEFT);
 				break;
 			case 3:
-				sendDataInitially(Cons.MODE_MEASURE_RIGHT);
+				//sendDataInitially(Cons.MODE_MEASURE_RIGHT);
 				break;
 		}
 	}
